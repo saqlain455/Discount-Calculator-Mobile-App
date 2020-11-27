@@ -1,16 +1,69 @@
 import * as React from 'react';
-import { Text, View, StyleSheet,TextInput,Button } from 'react-native';
+import { Text, View, StyleSheet,TextInput,Button,bind } from 'react-native';
 import Constants from 'expo-constants';
+
+// You can import from local files
+import AssetExample from './components/AssetExample';
+
+// or any pure javascript modules available in npm
+import { Card } from 'react-native-paper';
 
 export default class App extends React.Component  {
     constructor(){
       super();
-      this.state=({
-        TotalPrice:"",
-        DiscountPrice:0
+      this.state={
+        totalPrice:"",
+        discountPrice:0,
+        uSave:"",
+        finalPrice:"",
+        calculate:0
 
-        });
+        };
     }
+calDis=(test)=>{
+  if(test==""){
+    this.setState({
+    discountPrice:0
+    })
+  }
+  if(eval(test)>0 && eval(test)<1000){
+    this.setState({
+    discountPrice:2
+    })
+  }
+  else if(eval(test)>1000 && eval(test)<=2000){
+        this.setState({
+      discountPrice:5
+    })
+  }
+  else if(eval(test)>=2000){
+      this.setState({
+      discountPrice:10
+    })
+  }
+}
+
+total=(test)=>{
+      this.setState({
+        totalPrice:test
+      })
+}
+
+finalpriceCal=(test)=>{
+    test=eval(test) 
+    var finalp=  eval(test - (this.state.discountPrice/100)*test)
+        this.setState({
+         finalPrice: finalp
+      })
+
+}
+
+c=()=>{
+  this.setState({
+    calculate:1
+  })
+}
+
 
 render(){
   return (
@@ -18,15 +71,35 @@ render(){
       <View>
           <Text style={styles.paragraph}>Discount APP</Text>
           <Text>Total Price</Text>  
-          <TextInput style={styles.textInput}> </TextInput>
+          <TextInput placeholder="" style={styles.textInput} onChangeText={
+            (text)=> {
+             // if(this.state.calculate===true){
+                  this.calDis(text)
+                  this.total(text)
+                  this.finalpriceCal(text)  
+
+            //  }
+
+            } 
+
+          }> </TextInput>
+
           <Text>Discount Persentage</Text> 
-          <TextInput style={styles.textInput}> </TextInput>
+          <TextInput style={styles.textInput}>{this.state.discountPrice}% </TextInput>
+          <Text> finalPrice</Text>
+          <TextInput style={styles.textInput}>{this.state.finalPrice}</TextInput>
+          <Text> uSave</Text>
+          <TextInput style={styles.textInput}> {this.state.totalPrice-this.state.finalPrice}</TextInput>
+          <Button title="Save" onPress={()=>this.click}></Button>
+          <Text> </Text>
+          <Button title="History" onPress={()=>this.click}></Button>
+    
       </View>
-          </View>
+    </View>
   );
 }
+} 
 
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -44,8 +117,10 @@ const styles = StyleSheet.create({
   },
   textInput:{
     borderColor:'red',
-    borderWidth:2,
+  //  borderWidth:2,
     width:'40%',
+    textAlign: 'center',
+    borderBottomWidth:2
 
   }
 });
