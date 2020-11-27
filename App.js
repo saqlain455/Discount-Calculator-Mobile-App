@@ -1,21 +1,53 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { Text, View, StyleSheet,TextInput,Button } from 'react-native';
+import Constants from 'expo-constants';
 
-export default function App() {
+export default class App extends React.Component  {
+    constructor(){
+      super();
+      this.state=({
+        TotalPrice:"",
+        DiscountPrice:0
+
+        });
+    }
+
+render(){
   return (
     <View style={styles.container}>
-      <Text>Open up your App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      <View>
+          <Text style={styles.paragraph}>Discount APP</Text>
+          <Text>Total Price</Text>  
+          <TextInput style={styles.textInput}> </TextInput>
+          <Text>Discount Persentage</Text> 
+          <TextInput style={styles.textInput}> </TextInput>
+      </View>
+          </View>
   );
+}
+
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
+    paddingTop: Constants.statusBarHeight,
+    backgroundColor: '#ecf0f1',
+    padding: 8,
   },
+  paragraph: {
+    margin: 24,
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  textInput:{
+    borderColor:'red',
+    borderWidth:2,
+    width:'40%',
+
+  }
 });
+
+
