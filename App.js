@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React ,{useState,useEffect} from 'react';
 import {
   Text,
   View,
@@ -9,12 +9,46 @@ import {
   Modal,
   ScrollView,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
 } from 'react-native';
-
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack'
 import Constants from 'expo-constants';
-export default class App extends React.Component {
-  constructor() {
+
+const Stack=createStackNavigator();
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+      <Stack.Screen
+      name="First"
+      component={First}
+      options={{
+        title:'Welcome',
+        headerStyle:{
+            backgroundColor:'blue'
+        },
+        headerTintColor:'white',
+        headerRight:()=>{}
+    //    headerShown:false
+      }} />
+      <Stack.Screen name="History" component={History} options={{
+        title:'History',
+        headerStyle:{
+            backgroundColor:'blue'
+        },
+        headerTintColor:'white',
+        headerRight:()=>{}
+    //    headerShown:false
+      }}/>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+
+class First extends React.Component {
+  constructor({navigation,route}) {
     super();
     this.state = {
       totalPrice: '',
@@ -24,8 +58,16 @@ export default class App extends React.Component {
       calculate: '',
       list: [],
       chk: false,
-    };
+     };
+  navigation.setOptions({
+    headerRight: () => (
+      <Button style={{paddingTop:10}}
+      title="History2"
+      onPress={() => navigation.navigate('History',this.state.list)}></Button>
+    )
+  });
   }
+
 
   updateTotalPrice = (test) => {
     this.setState({
@@ -87,6 +129,7 @@ export default class App extends React.Component {
     Keyboard.dismiss()
   };
   
+  
 render() {
   return (
       <View style={styles.container}>
@@ -127,6 +170,10 @@ render() {
           <Button style={{paddingTop:10}}
             title="History"
             onPress={() => this.setState({ chk: true })}></Button>
+            <Button style={{paddingTop:10}}
+            title="History2"
+            onPress={() => this.props.navigation.navigate('History',this.state.list)}></Button>
+
         </View>
 
       <Modal transparent={true} visible={this.state.chk}>
@@ -152,6 +199,93 @@ render() {
     );
   }
 }
+
+// class History extends React.Component{
+//   constructor({navigation,route}) {
+//     super();
+//     this.state=({
+//       list:route.params
+//     })
+//   }
+
+//   render(){
+//     return(
+//       <View style={{ backgroundColor: '#000000aa', flex: 1 }}>
+//       <View style={{ margin: 50, backgroundColor: '#ffffff', flex: 1 }}>
+//         <ScrollView style={styles.scrollview}>
+//             {this.state.list.map((item, index) =>
+//               <TouchableOpacity key={item.key} activeOpacity={0.7} >
+//                 <View style={styles.scrollviewItem}>
+//                   <Text style={styles.scrollviewText}>{index + 1}# total prize iS {item.data.totalPrice}</Text>
+//                   <Text style={styles.scrollviewText}>discountPercentage is{item.data.discountPrice}</Text>
+//                   <Text style={styles.scrollviewText}>finalPrice is {item.data.finalPrice}</Text>
+//                   <Text style={styles.scrollviewText}>uSave: {item.data.uSave}</Text>
+//                 </View>
+//               </TouchableOpacity>
+//         )}
+//         </ScrollView>
+//       </View>
+
+
+
+
+
+
+
+//     </View>  
+//     );
+  
+//   } 
+// }
+
+const History=({navigation,route})=>{
+  const [getList,setList]=useState(route.params);
+                                                 // Tomorow inshallha solve this error
+  // navigation.setOptions({
+  //   headerRight: () => (
+  //     <Button style={{paddingTop:10}}
+  //     title="clear"
+  //     onPress={clear}></Button>
+  //   )
+  // });
+
+
+  // const clear=()=>{
+
+  //   var list= getList.filter(item=>item.key == item.key)  
+  // useEffect(() => {
+  //   setList(list)
+  // });
+  // }
+
+  const removeItem=(itemKey)=>{
+    var list= getList.filter(item=>item.key != itemKey)
+     setList(list)
+   }
+   
+    return(
+      <View style={{ backgroundColor: '#000000aa', flex: 1 }}>
+      <View style={{ margin: 0, backgroundColor: '#ffffff', flex: 1 }}>
+      <ScrollView style={{width:'100%' ,paddingTop:10, } } > 
+      {getList.map((item,index)=>{
+       return <TouchableOpacity key= {item.key} activeOpacity={0.6} onPress={()=>editItem(item)}  >
+         <View  style={styles.scrollItem}>
+           <Text style={{fontSize:30}}>{item.data.totalPrice} – {item.data.discountPrice}  =  {item.data.finalPrice} <TouchableOpacity onPress={()=>{removeItem(item.key)}}>
+           <View style={{backgroundColor:'gray', padding:0 ,borderRadius:15}}>
+           <Text style={{fontSize:30}}> x </Text>
+         </View>
+         </TouchableOpacity> </Text>
+
+         </View>         
+       </TouchableOpacity>
+         })}
+     </ScrollView>
+      </View>
+    </View>      
+    );
+  
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
