@@ -9,7 +9,9 @@ import {
   Modal,
   ScrollView,
   TouchableOpacity,
+  Keyboard
 } from 'react-native';
+
 import Constants from 'expo-constants';
 export default class App extends React.Component {
   constructor() {
@@ -19,49 +21,44 @@ export default class App extends React.Component {
       discountPrice: '',
       uSave: '',
       finalPrice: '',
-      calculate: 0,
+      calculate: '',
       list: [],
       chk: false,
     };
   }
-  calDis = (test) => {
-    
-    if (test == '') {
-      this.setState({
-        discountPrice: '',
-      });
-    }
-    if (Number(test) > 0 && Number(test) <= 1000) {
-      this.setState({
-        discountPrice: '20',
-      });
-    } if (Number(test) > 1000 && Number(test) <= 2000) {
-      this.setState({
-        discountPrice: '40',
-      });
-    } if (Number(test) > 2000) {
-      this.setState({
-        discountPrice: '50',
-      });
-    }
-  };
 
-  total = (test) => {
+  updateTotalPrice = (test) => {
     this.setState({
       totalPrice: test,
-    });
+    },
+     function() { 
+      console.log(this.state.discountPrice);
+      this.calculateFinalPrice();
+    }
+    );
   };
 
-  finalpriceCal = (test) => {
-    test = Number(test);
-    var f = (test - (this.state.discountPrice * test)/100);
-    this.setState({
-      finalPrice: f,
+  updateDiscountPercentage = (val) => {
+    console.log("Setting DP: " + val)
+    // setState is asynchronous. Therefore, calculating final price after updating the state
+    this.setState({discountPrice: val}, function() { 
+      console.log(this.state.discountPrice);
+      this.calculateFinalPrice();
     });
-   
-    console.log(test)
-    console.log(this.state.discountPrice)
-    console.log(f)
+  }
+
+  calculateFinalPrice = () => {
+    var totalPrice = Number(this.state.totalPrice);
+    var discountPercentage = this.state.discountPrice.length > 0 ? 
+                              Number(this.state.discountPrice) : 
+                              0;
+    var finalPrice = (totalPrice - (discountPercentage * totalPrice)/100);
+    this.setState({
+      finalPrice: finalPrice,
+    });
+    console.log("Total Price: " + totalPrice);
+    console.log("Discount Percentage:" + discountPercentage);
+    console.log("Final Price:" + finalPrice);
   }
 
   c = () => {
@@ -69,6 +66,7 @@ export default class App extends React.Component {
       calculate: 1,
     });
   };
+
   save = () => {
     let list = [
       ...this.state.list,
@@ -86,6 +84,7 @@ export default class App extends React.Component {
       list: list,
     });
     console.log(this.state.list);
+    Keyboard.dismiss()
   };
   
 render() {
@@ -98,17 +97,22 @@ render() {
             placeholder="plz input"
             keyboardType='numeric'
             style={styles.textInput}
+            value={this.state.totalPrice}
             onChangeText={(text) => {
-              // if(this.state.calculate===true){
-              this.total(text);
-              this.calDis(text);
-              this.finalpriceCal(text);
-              
-            }}></TextInput>
+              this.updateTotalPrice(text);
+              this.calculateFinalPrice();
 
-          <Text>Discount Persentage%</Text>
-          <TextInput style={styles.textInput}>
-            {this.state.discountPrice}
+            }}></TextInput>
+          <Text>Discount Percentage%</Text>
+          <TextInput 
+            style={styles.textInput}
+            keyboardType='numeric'
+            // value={this.state.discountPrice}
+            onChangeText={(text) => {
+              this.updateDiscountPercentage(text);
+              // this.calculateFinalPrice();
+              }}
+          >
           </TextInput>
           <Text> finalPrice</Text>
           <TextInput style={styles.textInput}>
@@ -148,7 +152,6 @@ render() {
     );
   }
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
