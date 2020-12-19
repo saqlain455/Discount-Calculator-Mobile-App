@@ -1,5 +1,6 @@
 import React ,{useState,useEffect} from 'react';
-import { DataTable } from 'react-native-paper';
+import { DataTable,IconButton } from 'react-native-paper';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import {
   Text,
   View,
@@ -61,18 +62,19 @@ class First extends React.Component {
       chk: false,
       error:''
      };
+ //   this.update;
+
+
+
   navigation.setOptions({
     headerRight: () => (
       <Button style={{paddingTop:10}}
       title="History"
-      onPress={() => navigation.navigate('History',this.state.list)}></Button>
+      onPress={() => navigation.navigate('History',{list:this.state.list, onGoBack: (data)=>    {this.setState({list:data})}})}></Button>
     )
   });
 
-  route.params?.list?this.setState({list:route.params.list}):()=>{console.log(route.params)}
-
-}
-                                                                               
+}                                                                               
   updateTotalPrice = (test) => {
     this.setState({
       totalPrice: test,
@@ -172,16 +174,16 @@ render() {
           >
           </TextInput>
           <Text style={{color:'red'}}> {this.state.error.length>0?this.state.error:''}</Text>
-          <Text> finalPrice</Text>
-          <TextInput style={styles.textInput}>
+          <Text> FinalPrice</Text>
+          <Text style={styles.textInput} >
             {this.state.finalPrice}
-          </TextInput>
+          </Text>
           <Text> uSave</Text>
-          <TextInput style={styles.textInput}>
+          <Text style={styles.textInput}>
             {this.state.totalPrice - this.state.finalPrice}
-          </TextInput>
-          <Button title="Save"  onPress={() => this.save()}></Button>
-          <TextInput> </TextInput>
+          </Text>
+          <Ionicons name="save" style={{alignSelf:'center',paddingTop:10,color:'blue'}} size={32}  onPress={() => this.state.totalPrice.length==0? '':this.save()}>save</Ionicons>
+
         </View>
     </View>
     );
@@ -222,8 +224,8 @@ render() {
 // }
 
 const History=({navigation,route})=>{
-  console.log(route.params)
-  const [getList,setList]=useState(route.params);
+  //console.log(route.params)
+  const [getList,setList]=useState(route.params.list);
      // Tomorow inshallha solve this error
   navigation.setOptions({
     headerRight: () => (
@@ -232,17 +234,21 @@ const History=({navigation,route})=>{
       onPress={clear}></Button>
     )
   });
-    useEffect(() => {
+ 
       navigation.setOptions({
             headerLeft: () => (
-              <Button style={{paddingTop:10}}
-              title="Back"
-              onPress={() => navigation.goBack('First',{list:getList})}></Button>
+                <View style={{ paddingLeft: 10 }}>
+                  <Ionicons
+                    name="arrow-back"
+                    size={32}
+                    color="white"
+                    onPress={() => {route.params.onGoBack(getList);navigation.goBack('First')}} 
+                  />
+                </View>
             )
-      });
-       console.log(getList)
     });
-  
+     
+
   const clear=()=>{  
           setList( getList.filter(item=>item.key != item.key))
   }
@@ -268,7 +274,7 @@ const History=({navigation,route})=>{
        <DataTable.Cell><Text style={styles.scrollviewText}>{item.data.totalPrice}</Text></DataTable.Cell>
        <DataTable.Cell ><Text style={styles.scrollviewText}>{item.data.discountPrice}</Text> </DataTable.Cell>
        <DataTable.Cell > <Text style={styles.scrollviewText}>{item.data.finalPrice}</Text></DataTable.Cell>
-       <TouchableOpacity onPress={()=>{removeItem(item.key)}}><DataTable.Cell >X</DataTable.Cell></TouchableOpacity> 
+  <Ionicons name='close-circle' size={35} onPress={()=>{removeItem(item.key)}}><DataTable.Cell ></DataTable.Cell></Ionicons> 
       </DataTable.Row>
    </DataTable>
 
